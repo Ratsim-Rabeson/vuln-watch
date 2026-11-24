@@ -1,0 +1,11 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "metadata": {"component": {"type": "container", "name": "registry.example/bpi/batch", "version": "sha256:abc"}},
+  "components": [
+    {"type": "application", "name": "java", "version": "21.0.13.1+1", "purl": "pkg:generic/java@21.0.13.1"},
+    {"type": "library", "name": "nginx", "version": "1.26.2-r0", "purl": "pkg:apk/alpine/nginx@1.26.2-r0?distro=alpine-3.20"},
+    {"type": "library", "name": "demo-lib", "version": "1.4.2", "purl": "pkg:npm/demo-lib@1.4.2",
+     "components": [{"type": "library", "name": "openjdk-17-jre-headless", "version": "17.0.13+11-2~deb12u1", "purl": "pkg:deb/debian/openjdk-17-jre-headless@17.0.13%2B11-2~deb12u1"}]}
+  ]
+}

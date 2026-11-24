@@ -1,0 +1,7 @@
+image:
+  repository: quay.io/keycloak/keycloak
+  tag: "26.0"
+sidecar:
+  repository: registry.k8s.io/ingress-nginx/controller
+  pullPolicy: IfNotPresent
+  tag: v1.12.1

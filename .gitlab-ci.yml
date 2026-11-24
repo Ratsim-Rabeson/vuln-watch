@@ -1,0 +1,32 @@
+# Pipeline du projet vuln-watch lui-même : tests, et scan à la demande de tout un groupe.
+#
+# Scan de groupe — prérequis : variable CI/CD masquée et protégée VULN_WATCH_TOKEN
+# (jeton d'accès de groupe, rôle Reporter, portée read_api uniquement).
+# Lancement : Build > Pipelines > Run pipeline, en renseignant VULN_WATCH_GROUP (et VULN_WATCH_CVE si besoin),
+# ou via un pipeline planifié (par exemple chaque matin pendant la campagne).
+
+variables:
+  PYTHON_IMAGE: "python:3.12-slim"   # remplacer par le miroir interne
+  VULN_WATCH_GROUP: ""               # ex. lcl/bpi
+  VULN_WATCH_CVE: ""                 # vide = toute la watchlist ; sinon ex. CVE-2026-123007 ou Java4Shell
+
+tests:
+  image: "$PYTHON_IMAGE"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_PIPELINE_SOURCE == "push"
+  script:
+    - python3 -m unittest discover -s tests -v
+
+vuln-watch-group:
+  image: "$PYTHON_IMAGE"
+  rules:
+    - if: ($CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web") && $VULN_WATCH_GROUP
+  script:
+    - if [ -n "$VULN_WATCH_CVE" ]; then set -- --cve "$VULN_WATCH_CVE"; fi
+    - python3 vuln_watch.py group --gitlab-url "$CI_SERVER_URL" --group "$VULN_WATCH_GROUP"
+        --token-env VULN_WATCH_TOKEN --out vuln-watch-group "$@"
+  artifacts:
+    when: always
+    paths: [vuln-watch-group/]
+    expire_in: 180 days

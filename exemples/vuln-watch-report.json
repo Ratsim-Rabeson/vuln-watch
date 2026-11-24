@@ -1,0 +1,264 @@
+{
+  "tool": "vuln-watch",
+  "version": "0.1.0",
+  "generated_at": "2026-11-23T23:54:35+01:00",
+  "scope": "groupe bpi",
+  "ci_job_url": null,
+  "rules": [
+    {
+      "id": "JAVA4SHELL",
+      "label": "Java4Shell (CVE-2026-114938)",
+      "cves": [
+        "CVE-2026-114938"
+      ],
+      "checked_on": "2026-11-23"
+    },
+    {
+      "id": "NGINX2ROOT",
+      "label": "NGINX2Root (5 CVE)",
+      "cves": [
+        "CVE-2026-123007",
+        "CVE-2026-123633",
+        "CVE-2026-123634",
+        "CVE-2026-121810",
+        "CVE-2026-113425"
+      ],
+      "checked_on": "2026-11-23"
+    }
+  ],
+  "summary": {
+    "runtime": {
+      "VULNERABLE": 2,
+      "UNKNOWN": 2,
+      "OK": 3
+    },
+    "build_ci": {
+      "VULNERABLE": 0,
+      "UNKNOWN": 2,
+      "OK": 0
+    }
+  },
+  "projects": [
+    {
+      "project": "bpi/cia/front-espace-client",
+      "files_analysed": 3,
+      "observations": 1,
+      "findings": 1
+    },
+    {
+      "project": "bpi/cia/back-comptes",
+      "files_analysed": 4,
+      "observations": 6,
+      "findings": 6
+    },
+    {
+      "project": "bpi/fbi/batch-releves",
+      "files_analysed": 2,
+      "observations": 2,
+      "findings": 2
+    },
+    {
+      "project": "bpi/fbi/lib-commune",
+      "files_analysed": 0,
+      "observations": 0,
+      "findings": 0
+    }
+  ],
+  "findings": [
+    {
+      "project": "bpi/cia/back-comptes",
+      "rule": "JAVA4SHELL",
+      "label": "Java4Shell (CVE-2026-114938)",
+      "cves": [
+        "CVE-2026-114938"
+      ],
+      "component": "java",
+      "version": "21",
+      "verdict": "UNKNOWN",
+      "verdict_fr": "À VÉRIFIER",
+      "context": "ci",
+      "source": "ci",
+      "location": ".gitlab-ci.yml:3",
+      "image": "maven:3.9.9-eclipse-temurin-21",
+      "target": "21.0.13.1",
+      "notes": [
+        "seule la version majeure (21) se lit dans le nom de l’image",
+        "image de job CI : outil de build, pas un service exposé",
+        "version imprécise (21) : vulnérable ou non selon le correctif, relever la version exacte (probe)"
+      ]
+    },
+    {
+      "project": "bpi/cia/back-comptes",
+      "rule": "JAVA4SHELL",
+      "label": "Java4Shell (CVE-2026-114938)",
+      "cves": [
+        "CVE-2026-114938"
+      ],
+      "component": "java",
+      "version": "21",
+      "verdict": "UNKNOWN",
+      "verdict_fr": "À VÉRIFIER",
+      "context": "build",
+      "source": "dockerfile",
+      "location": "Dockerfile:1",
+      "image": "maven:3.9.9-eclipse-temurin-21",
+      "target": "21.0.13.1",
+      "notes": [
+        "seule la version majeure (21) se lit dans le nom de l’image",
+        "étape de build multi-stage, absente de l’image finale",
+        "version imprécise (21) : vulnérable ou non selon le correctif, relever la version exacte (probe)"
+      ]
+    },
+    {
+      "project": "bpi/cia/back-comptes",
+      "rule": "JAVA4SHELL",
+      "label": "Java4Shell (CVE-2026-114938)",
+      "cves": [
+        "CVE-2026-114938"
+      ],
+      "component": "java",
+      "version": "21.0.5",
+      "verdict": "VULNERABLE",
+      "verdict_fr": "VULNÉRABLE",
+      "context": "runtime",
+      "source": "dockerfile",
+      "location": "Dockerfile:6",
+      "image": "eclipse-temurin:21.0.5_11-jre",
+      "target": "21.0.13.1",
+      "notes": [
+        "contournement repéré dans : k8s/deployment.yaml"
+      ]
+    },
+    {
+      "project": "bpi/cia/back-comptes",
+      "rule": "JAVA4SHELL",
+      "label": "Java4Shell (CVE-2026-114938)",
+      "cves": [
+        "CVE-2026-114938"
+      ],
+      "component": "java",
+      "version": null,
+      "verdict": "UNKNOWN",
+      "verdict_fr": "À VÉRIFIER",
+      "context": "runtime",
+      "source": "manifest",
+      "location": "values.yaml:2",
+      "image": "quay.io/keycloak/keycloak:26.0",
+      "target": "",
+      "notes": [
+        "produit embarquant une JVM (keycloak) : vérifier l’avis de l’éditeur",
+        "contournement repéré dans : k8s/deployment.yaml"
+      ]
+    },
+    {
+      "project": "bpi/cia/back-comptes",
+      "rule": "NGINX2ROOT",
+      "label": "NGINX2Root (5 CVE)",
+      "cves": [
+        "CVE-2026-123007",
+        "CVE-2026-123633",
+        "CVE-2026-123634",
+        "CVE-2026-121810",
+        "CVE-2026-113425"
+      ],
+      "component": "nginx",
+      "version": "1.31.9",
+      "verdict": "OK",
+      "verdict_fr": "OK",
+      "context": "runtime",
+      "source": "manifest",
+      "location": "k8s/deployment.yaml:15",
+      "image": "nginxinc/nginx-unprivileged:1.31.9-alpine",
+      "target": "",
+      "notes": []
+    },
+    {
+      "project": "bpi/cia/back-comptes",
+      "rule": "NGINX2ROOT",
+      "label": "NGINX2Root (5 CVE)",
+      "cves": [
+        "CVE-2026-123007",
+        "CVE-2026-123633",
+        "CVE-2026-123634",
+        "CVE-2026-121810",
+        "CVE-2026-113425"
+      ],
+      "component": "nginx",
+      "version": null,
+      "verdict": "UNKNOWN",
+      "verdict_fr": "À VÉRIFIER",
+      "context": "runtime",
+      "source": "manifest",
+      "location": "values.yaml:5",
+      "image": "registry.k8s.io/ingress-nginx/controller:v1.12.1",
+      "target": "",
+      "notes": [
+        "nginx embarqué dans un produit : sa version ne se lit pas dans le tag, voir l’avis de l’éditeur"
+      ]
+    },
+    {
+      "project": "bpi/cia/front-espace-client",
+      "rule": "NGINX2ROOT",
+      "label": "NGINX2Root (5 CVE)",
+      "cves": [
+        "CVE-2026-123007",
+        "CVE-2026-123633",
+        "CVE-2026-123634",
+        "CVE-2026-121810",
+        "CVE-2026-113425"
+      ],
+      "component": "nginx",
+      "version": "1.27.3",
+      "verdict": "VULNERABLE",
+      "verdict_fr": "VULNÉRABLE",
+      "context": "runtime",
+      "source": "dockerfile",
+      "location": "Dockerfile:8",
+      "image": "nginx:1.27.3-alpine",
+      "target": "1.30.7",
+      "notes": [
+        "HTTP/2 activé : nginx/default.conf:2"
+      ]
+    },
+    {
+      "project": "bpi/fbi/batch-releves",
+      "rule": "JAVA4SHELL",
+      "label": "Java4Shell (CVE-2026-114938)",
+      "cves": [
+        "CVE-2026-114938"
+      ],
+      "component": "java",
+      "version": "21.0.13.1",
+      "verdict": "OK",
+      "verdict_fr": "OK",
+      "context": "runtime",
+      "source": "dockerfile",
+      "location": "Dockerfile:4",
+      "image": "eclipse-temurin:21.0.13.1_1-jre",
+      "target": "",
+      "notes": []
+    },
+    {
+      "project": "bpi/fbi/batch-releves",
+      "rule": "NGINX2ROOT",
+      "label": "NGINX2Root (5 CVE)",
+      "cves": [
+        "CVE-2026-123007",
+        "CVE-2026-123633",
+        "CVE-2026-123634",
+        "CVE-2026-121810",
+        "CVE-2026-113425"
+      ],
+      "component": "nginx",
+      "version": "1.30.7",
+      "verdict": "OK",
+      "verdict_fr": "OK",
+      "context": "runtime",
+      "source": "dockerfile",
+      "location": "Dockerfile.front:1",
+      "image": "nginx:1.30.7-alpine",
+      "target": "",
+      "notes": []
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: back-java
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: registry.example/bpi/back-java:2026.11.0
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:+UnlockDiagnosticVMOptions -XX:-UseBASE64Intrinsics"
+        - name: proxy
+          image: "nginxinc/nginx-unprivileged:1.31.9-alpine"
+        - name: templated
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

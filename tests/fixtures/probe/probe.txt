@@ -1,0 +1,15 @@
+# image: registry.example/bpi/back-java:2026.11.0
+## java -version
+openjdk version "21.0.5" 2024-10-15 LTS
+OpenJDK Runtime Environment Temurin-21.0.5+11 (build 21.0.5+11-LTS)
+OpenJDK 64-Bit Server VM Temurin-21.0.5+11 (build 21.0.5+11-LTS, mixed mode, sharing)
+## release
+IMPLEMENTOR="Eclipse Adoptium"
+JAVA_VERSION="21.0.5"
+## nginx -v
+sh: nginx: not found
+# image: registry.example/vps/front:2026.11.2
+## java -version
+sh: java: not found
+## nginx -v
+nginx version: nginx/1.27.3

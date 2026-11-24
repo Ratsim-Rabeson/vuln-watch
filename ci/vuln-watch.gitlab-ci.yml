@@ -1,0 +1,65 @@
+# vuln-watch — template GitLab CI pour les projets (binôme BPI)
+#
+# À inclure dans le .gitlab-ci.yml d'un projet :
+#
+#   include:
+#     - project: "<groupe>/vuln-watch"        # projet qui héberge vuln-watch
+#       ref: main
+#       file: "ci/vuln-watch.gitlab-ci.yml"
+#
+#   variables:
+#     VULN_WATCH_APP_IMAGE: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"   # image construite par le pipeline
+#
+# Les deux jobs utilisent le stage « test » : surcharger « stage: » si le projet n'a pas ce stage.
+# Commencer en observation (VULN_WATCH_FAIL_ON: "never"), passer à "vulnerable" une fois les lots corrigés.
+# Prérequis : autoriser le jeton de job des projets à lire vuln-watch
+# (vuln-watch > Settings > CI/CD > Job token permissions > ajouter le groupe).
+
+variables:
+  VULN_WATCH_PROJECT: "<groupe>/vuln-watch"   # chemin du projet vuln-watch
+  VULN_WATCH_REF: "main"
+  VULN_WATCH_PYTHON_IMAGE: "python:3.12"      # remplacer par le miroir interne ; image avec git, Python 3.11+
+  VULN_WATCH_FAIL_ON: "never"                 # never | vulnerable | unknown
+
+# 1. Relève les versions réelles dans l'image construite (java -version, nginx -v).
+vuln-watch-probe:
+  stage: test
+  image:
+    name: "$VULN_WATCH_APP_IMAGE"
+    entrypoint: [""]
+  variables:
+    GIT_STRATEGY: none
+  rules:
+    - if: $VULN_WATCH_APP_IMAGE
+  allow_failure: true            # image sans shell (distroless) : utiliser une SBOM à la place
+  script:
+    - |
+      {
+        echo "# image: ${VULN_WATCH_APP_IMAGE}"
+        echo "## java -version"; java -version 2>&1 || true
+        echo "## release"; cat "${JAVA_HOME:-/opt/java/openjdk}/release" 2>/dev/null || true
+        echo "## nginx -v"; nginx -v 2>&1 || true
+        echo "## env"; env | grep -E '^(JAVA_TOOL_OPTIONS|JDK_JAVA_OPTIONS|JAVA_OPTS)=' || true
+      } > vuln-watch-probe.txt
+    - cat vuln-watch-probe.txt
+  artifacts:
+    paths: [vuln-watch-probe.txt]
+    expire_in: 30 days
+
+# 2. Analyse le dépôt (Dockerfile, manifests, conf nginx, package-lock, SBOM) et rend le verdict.
+vuln-watch:
+  stage: test
+  image: "$VULN_WATCH_PYTHON_IMAGE"
+  needs:
+    - job: vuln-watch-probe
+      optional: true
+  script:
+    - git clone --quiet --depth 1 --branch "$VULN_WATCH_REF"
+        "${CI_SERVER_PROTOCOL}://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}:${CI_SERVER_PORT}/${VULN_WATCH_PROJECT}.git"
+        /tmp/vuln-watch
+    - python3 /tmp/vuln-watch/vuln_watch.py scan . --probe vuln-watch-probe.txt --out vuln-watch-report
+        --fail-on "$VULN_WATCH_FAIL_ON"
+  artifacts:
+    when: always
+    paths: [vuln-watch-report/]
+    expire_in: 90 days

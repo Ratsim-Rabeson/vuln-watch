@@ -1,0 +1,71 @@
+# vuln-watch — watchlist des vulnérabilités suivies par le binôme BPI
+#
+# Une règle = une faille. Format des plages vulnérables : ">=A <B" (A inclus, B exclu).
+# Plusieurs plages = OU. Une version hors de toutes les plages est jugée non vulnérable.
+# « label » doit être identique au libellé de la liste « Vulnérabilités » du fichier de suivi Excel.
+# Règle d'or : chaque plage cite sa source et sa date de vérification ; aucune plage inventée.
+# Toute nouvelle règle est relue par un Security Champion avant d'être fusionnée.
+
+[[rule]]
+id = "JAVA4SHELL"
+alias = "Java4Shell"
+label = "Java4Shell (CVE-2026-114938)"
+cves = ["CVE-2026-114938"]
+component = "java"
+severity = "critique (CVSS 4.0 : 9.2)"
+vulnerable = [
+  { range = ">=17.0.6 <17.0.21.1" },
+  { range = ">=18 <21", note = "version non LTS en fin de vie, non listée dans l’avis : présumée vulnérable, migrer vers une LTS corrigée" },
+  { range = ">=21 <21.0.13.1" },
+  { range = ">=22 <25", note = "version non LTS en fin de vie, non listée dans l’avis : présumée vulnérable, migrer vers une LTS corrigée" },
+  { range = ">=25 <25.0.5.1" },
+  { range = ">=26 <27", note = "version non LTS en fin de vie, non listée dans l’avis : présumée vulnérable, migrer vers une LTS corrigée" },
+  { range = ">=27 <27.0.1.1" },
+]
+# Versions cibles par ligne majeure (builds Oracle ; les autres distributions publient leurs propres numéros)
+targets = { "17" = "17.0.21.1", "21" = "21.0.13.1", "25" = "25.0.5.1", "27" = "27.0.1.1", "*" = "21.0.13.1 ou 25.0.5.1" }
+fix = "Passer au runtime Java de novembre 2026 (Oracle 17.0.21.1, 21.0.13.1, 25.0.5.1, 27.0.1.1 ou l’équivalent de la distribution), reconstruire l’image, redémarrer les JVM."
+mitigation = "-XX:+UnlockDiagnosticVMOptions -XX:-UseBASE64Intrinsics, à valider avec SEC et à tester au démarrage. Exploitation possible seulement sur x86-64 avec AVX-512 VBMI."
+mitigation_markers = ["UseBASE64Intrinsics", "UseAVX=2"]
+sources = [
+  "https://www.group-ib.com/blog/java4shell-vulnerability/",
+  "https://www.securityweek.com/java4shell-vulnerability-puts-many-enterprise-applications-at-risk-of-takeover",
+  "alerte CERT-FR du 18/11/2026",
+]
+checked_on = "2026-11-23"
+
+[[rule]]
+id = "NGINX2ROOT"
+alias = "NGINX2Root"
+label = "NGINX2Root (5 CVE)"
+cves = ["CVE-2026-123007", "CVE-2026-123633", "CVE-2026-123634", "CVE-2026-121810", "CVE-2026-113425"]
+component = "nginx"
+severity = "critique (CVSS 4.0 : 9.2)"
+vulnerable = [
+  { range = "<1.30.7" },
+  { range = ">=1.31.0 <1.31.9" },
+]
+targets = { "1.31" = "1.31.9", "*" = "1.30.7" }
+fix = "Passer à nginx 1.30.7 (stable) ou 1.31.9 (mainline), reconstruire et redéployer l’image."
+mitigation = "Désactiver HTTP/2 ne couvre que CVE-2026-123007 et CVE-2026-123633 ; HTTP/3, resolver et mail proxy restent exposés."
+mitigation_markers = []
+sources = [
+  "https://www.cisecurity.org/advisory/multiple-vulnerabilities-in-nginx-could-allow-for-remote-code-execution_2026-136",
+  "https://blog.qualys.com/misc/2026/11/18/nginx2root-five-nginx-flaws-led-by-cve-2026-123007-how-to-find-mitigate-and-patch-now",
+]
+checked_on = "2026-11-23"
+
+# ---------------------------------------------------------------------------
+# Modèle pour une bibliothèque npm ou Maven (détectée dans package-lock.json ou dans une SBOM) :
+#
+# [[rule]]
+# id = "EXEMPLE-NPM"
+# alias = "NomCourt"
+# label = "NomCourt (CVE-AAAA-NNNNN)"
+# cves = ["CVE-AAAA-NNNNN"]
+# component = "npm:nom-du-paquet"        # ou "maven:groupe:artefact"
+# vulnerable = [ { range = ">=1.0.0 <1.4.2" } ]
+# targets = { "*" = "1.4.2" }
+# fix = "Mettre à jour nom-du-paquet en 1.4.2 ou plus récent."
+# sources = ["URL de l’avis officiel"]
+# checked_on = "AAAA-MM-JJ"
