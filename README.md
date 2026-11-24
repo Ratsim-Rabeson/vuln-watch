@@ -1,9 +1,5 @@
 # vuln-watch — scan de CVE à la demande
 
-POC du binôme BPI pour répondre vite et avec une preuve à la question
-« tel projet est-il encore touché par telle faille ? », sans attendre le rafraîchissement
-quotidien du Command Center.
-
 - **Watchlist** : les failles suivies et leurs plages de versions (`watchlist.toml`) ;
   Java4Shell et NGINX2Root y sont déjà.
 - **Scan d’un projet** : dans un job GitLab CI ou sur un poste, verdict et rapports.
